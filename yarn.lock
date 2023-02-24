@@ -951,6 +951,18 @@ fast-levenshtein@~2.0.6:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
 
+fastest-express-validator@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/fastest-express-validator/-/fastest-express-validator-1.8.1.tgz#aa095f2bc0e283b4562700d769b00ccca65ece43"
+  integrity sha512-cm+LlOE2zucaYht2hVw5kWq8OGo5sofWn1oDfQ4H0mk9E/0RauFh3ybsIyQRwgXqey83sFmG/oQ4w7Z0MnNqVg==
+  dependencies:
+    fastest-validator "^1.13.0"
+
+fastest-validator@^1.13.0:
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/fastest-validator/-/fastest-validator-1.16.0.tgz#62854af86a4cdb568dce122b3f6b944ea795e553"
+  integrity sha512-+C1cFoLboOZIZs2PWhceNtJ15zCoiRalu1LnJB4hy63Y8Tto9bkqGcTGkzegt+Xu4qy3LE9GL6CLzEdpZ5xJBQ==
+
 fclone@1.0.11, fclone@~1.0.11:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/fclone/-/fclone-1.0.11.tgz#10e85da38bfea7fc599341c296ee1d77266ee640"

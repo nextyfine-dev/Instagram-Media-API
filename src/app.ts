@@ -6,10 +6,12 @@ import morgan from "morgan";
 import compression from "compression";
 import config from "./config/index.js";
 import { nodeEnv } from "./config/constants.js";
-// import { LoggerStream } from "./logs/logger.js";
+import { LoggerStream } from "./logs/logger.js";
 import { sendSuccessRes } from "./services/serverService.js";
-import axios from "axios";
-import { load } from "cheerio";
+import AppError from "./utils/AppError.js";
+import { StatusCodes } from "http-status-codes";
+import errorController from "./controllers/errorController.js";
+import router from "./routes/index.js";
 
 const app = express();
 
@@ -21,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "1mb" }));
 
 if (config.NODE_ENV === nodeEnv.development) {
-  app.use(morgan("dev"));
+  app.use(morgan("dev", { stream: new LoggerStream() }));
 }
 
 const limiter = rateLimit({
@@ -32,25 +34,24 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-app.use("/public", express.static("public"));
-
 app.get("/", (req, res) => sendSuccessRes(res, "Welcome to API"));
 
-app.get("/insta", async (req, res) => {
-  try {
-    const url = req.query.url as string;
-    const { data } = await axios.get(url);
-
-    const $ = load(data);
-
-    const script = $('script[type="application/ld+json"]').html() || "";
-
-    const jsonSc = JSON.parse(script);
-
-    sendSuccessRes(res, "success", jsonSc);
-  } catch (error) {
-    sendSuccessRes(res, "error", null, 500);
-  }
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send("User-agent: *\nDisallow: /");
 });
+
+app.use("/v1/insta", router);
+
+app.all("*", (req, res, next) =>
+  next(
+    new AppError(
+      `Can't find ${req.originalUrl} on this server!`,
+      StatusCodes.NOT_FOUND
+    )
+  )
+);
+
+app.use(errorController);
 
 export default app;

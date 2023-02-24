@@ -1,9 +1,9 @@
-// import cluster from "node:cluster";
+import cluster from "node:cluster";
 import { Response, Express } from "express";
 import { StatusCodes } from "http-status-codes";
-// import config from "../config/index.js";
-// import { cpuLength } from "../config/constants.js";
-// // import logger from "../logs/logger.js";
+import config from "../config/index.js";
+import { cpuLength } from "../config/constants.js";
+import logger from "../logs/logger.js";
 
 export const sendSuccessRes = (
   res: Response,
@@ -18,20 +18,20 @@ export const sendSuccessRes = (
     data,
   });
 
-// export const runOnThread = (app: Express) => {
-//   const port = config.PORT || 8080;
-//   if (cluster.isPrimary) {
-//     for (let i = 0; i < cpuLength; i++) {
-//       cluster.fork();
-//     }
+export const runOnThread = (app: Express) => {
+  const port = config.PORT || 8080;
+  if (cluster.isPrimary) {
+    for (let i = 0; i < cpuLength; i++) {
+      cluster.fork();
+    }
 
-//     cluster.on("exit", (worker, code, signal) => {
-//       logger.warn(`worker ${worker.process.pid} died`);
-//       cluster.fork();
-//     });
-//   } else {
-//     app.listen(port, () => {
-//       logger.info(`server ${process.pid} @ http://127.0.0.1:${port}`);
-//     });
-//   }
-// };
+    cluster.on("exit", (worker, code, signal) => {
+      logger.warn(`worker ${worker.process.pid} died`);
+      cluster.fork();
+    });
+  } else {
+    app.listen(port, () => {
+      logger.info(`server ${process.pid} @ http://127.0.0.1:${port}`);
+    });
+  }
+};
