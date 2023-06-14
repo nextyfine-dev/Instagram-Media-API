@@ -4,7 +4,7 @@ import axios from "axios";
 // import fs from "node:fs/promises";
 
 const getData = async () => {
-  const url = "https://www.instagram.com/p/Cs8O8oSPWR0/";
+  const url = "https://www.instagram.com/p/Cd75BuCv0-X/";
 
   const { data } = await axios.get(url);
 
