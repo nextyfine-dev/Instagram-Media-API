@@ -15,9 +15,12 @@ The Instagram Media API provides easy access to Instagram posts (videos/images).
 To get started with the Instagram Media API, follow these steps:
 
 1. Download the repository:
-   - HTTPS: [https://github.com/nextyfine-dev/Instagram-Media-API.git](https://github.com/nextyfine-dev/Instagram-Media-API.git)
-   - SSH: `git@github.com:nextyfine-dev/Instagram-Media-API.git`
+   - HTTPS: `git clone https://github.com/nextyfine-dev/Instagram-Media-API.git`
+    Or
+   - SSH: `git clone git@github.com:nextyfine-dev/Instagram-Media-API.git`
+    Or
    - GitHub CLI: `gh repo clone nextyfine-dev/Instagram-Media-API`
+    Or
    - Download the zip.
 
 2. Navigate to the Instagram-Media-API folder:
