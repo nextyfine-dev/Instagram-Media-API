@@ -46,7 +46,10 @@ To get started with the Instagram Media API, follow these steps:
 
 ## Usage
 
-API Endpoint: `http://127.0.0.1:8080/api/v1/posts` (POST request)
+API Endpoint:- `/api/v1/posts`
+
+Example:-
+POST Request: `http://127.0.0.1:8080/api/v1/posts`
 
 - Request JSON Body:
   ```json
