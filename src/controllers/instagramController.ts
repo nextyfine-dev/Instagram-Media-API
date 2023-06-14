@@ -178,7 +178,7 @@ export const getInstaDataByUSerName = catchAsync(
 
     // // console.log("highlightsUrl", highlightsUrl);
     // const d = await http(
-    //   "https://www.instagram.com/api/v1/users/web_profile_info/?username=nita_shilimkar"
+    //   "https://www.instagram.com/api/v1/users/web_profile_info/?username=nextyfine"
     // );
 
     // console.log("userUrl", userUrl);
