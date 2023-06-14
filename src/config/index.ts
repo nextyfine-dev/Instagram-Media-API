@@ -13,4 +13,6 @@ dotenv.config({ path: envPath });
 export default {
   NODE_ENV: process.env.NODE_ENV,
   PORT: process.env.PORT,
+  APP_ID: process.env.APP_ID,
+  APP_SECRET: process.env.APP_SECRET,
 };

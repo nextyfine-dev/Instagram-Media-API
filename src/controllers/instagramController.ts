@@ -1,10 +1,17 @@
 import { load } from "cheerio";
 import { NextFunction, Request, Response } from "express";
 import http from "../services/http.js";
-import { getInstaUrl } from "../services/instagramService.js";
+import {
+  getApiUrl,
+  getInstaUrl,
+  getShortCodeMedia,
+  getUserId,
+  getUserNameUrl,
+} from "../services/instagramService.js";
 import { sendSuccessRes } from "../services/serverService.js";
 import AppError from "../utils/AppError.js";
 import catchAsync from "../utils/catchAsync.js";
+import { Author, Image, Result, Video } from "../interfaces/index.js";
 
 export const getInstagramPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +28,7 @@ export const getInstagramPost = catchAsync(
 
     const script = $('script[type="application/ld+json"]').html();
 
-    let result;
+    let result: Result;
     let hasVideo = false;
     let hasImage = false;
 
@@ -43,9 +50,9 @@ export const getInstagramPost = catchAsync(
         images: jsonData.image,
       };
     } else {
-      const videos = [];
-      const images = [];
-      let author;
+      const videos: Video[] = [];
+      const images: Image[] = [];
+      let author: Author;
 
       const embedUrl = getInstaUrl(instaUrl, true);
 
@@ -55,35 +62,12 @@ export const getInstagramPost = catchAsync(
       const data = await http(embedUrl);
 
       const $ = load(data);
-      const last = $("script").last().html();
-      if (last) {
-        const textToMatch = "contextJSON";
-        const contextJSON = new RegExp(`(${textToMatch}).*?(\\{.*?\\})`, "s");
-        const match = last.match(contextJSON);
+      const media = getShortCodeMedia($);
 
-        if (!match)
-          return next(new AppError("Instagram posts not found!", 404));
-
-        let rawData: any = match.input;
-
-        const regex = /"gql_data\\":{.*}/gm;
-
-        rawData = rawData && rawData.match(regex);
-
-        rawData = rawData && rawData[0].replace(/\\/gm, "");
-
-        rawData = rawData && rawData.match(/\{(.*?)\}"/gm)[0].slice(0, -2);
-
-        const data = JSON.parse(rawData);
-
-        if (!data || !data.shortcode_media)
-          return next(new AppError("Instagram posts not found!", 404));
-
-        console.log("data", data);
-        if (data.shortcode_media.edge_sidecar_to_children) {
-          if (data.shortcode_media.edge_sidecar_to_children.edges.length > 0) {
-            for (const i of data.shortcode_media.edge_sidecar_to_children
-              .edges) {
+      if (media) {
+        if (media.edge_sidecar_to_children) {
+          if (media.edge_sidecar_to_children.edges.length > 0) {
+            for (const i of media.edge_sidecar_to_children.edges) {
               if (i.node.is_video) {
                 videos.push({
                   contentUrl: i.node.video_url,
@@ -101,33 +85,34 @@ export const getInstagramPost = catchAsync(
             }
           }
         } else {
-          if (data.shortcode_media.is_video) {
+          if (media.is_video) {
             videos.push({
-              contentUrl: data.shortcode_media.video_url,
-              thumbnailUrl: data.shortcode_media.display_url,
-              height: data.shortcode_media.dimensions.height,
-              width: data.shortcode_media.dimensions.width,
+              contentUrl: media.video_url,
+              thumbnailUrl: media.display_url,
+              height: media.dimensions.height,
+              width: media.dimensions.width,
             });
           } else {
             images.push({
-              url: data.shortcode_media.display_url,
-              height: data.shortcode_media.dimensions.height,
-              width: data.shortcode_media.dimensions.width,
+              url: media.display_url,
+              height: media.dimensions.height,
+              width: media.dimensions.width,
             });
           }
         }
 
         author = {
-          image: data.shortcode_media.owner.profile_pic_url,
-          alternateName: `@${data.shortcode_media.owner.username}`,
+          image: media.owner.profile_pic_url,
+          alternateName: `@${media.owner.username}`,
         };
       } else if (
         $(".EmbeddedMediaImage").attr("src") &&
         data.indexOf("shortcode_media") < 1
       ) {
-        images.push({ utl: $(".EmbeddedMediaImage").attr("src") });
+        const url = $(".EmbeddedMediaImage").attr("src") || "";
+        images.push({ url });
         author = {
-          image: $(".HoverCardProfile").find("img").attr("src"),
+          image: $(".HoverCardProfile").find("img").attr("src") || "",
           alternateName: `@${$(".HoverCardUserName > .Username").text()}`,
         };
       } else return next(new AppError("Instagram posts not found!", 404));
@@ -147,3 +132,77 @@ export const getInstagramPost = catchAsync(
     sendSuccessRes(res, "Instagram post found!", result);
   }
 );
+
+export const getInstaDataByUSerName = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userName = req.body.userName as string;
+
+    // const baseUrl = "https://www.instagram.com";
+    // const PROFILE_HASH = "69cba40317214236af40e7efa697781d";
+
+    const userUrl = getUserNameUrl(userName);
+    // const userUrl = testUrl(userName);
+
+    if (!userUrl) return next(new AppError("Enter a valid username!", 400));
+
+    const html = await http(userUrl);
+    // await writeFile("userStory.html", html);
+
+    const $ = load(html);
+
+    const userId = getUserId($);
+    // console.log("userId", userId);
+
+    if (!userId) return next(new AppError("User not found!", 400));
+
+    // const url = `https://www.instagram.com/graphql/query/?query_hash=472f257a40c653c64c666ce877d59d2b&variables={"id":"${userId}","first":1}`;
+    // const url = `https://www.instagram.com/graphql/query/?query_hash=2c5d4d8b70cad329c4a6ebe3abb6eedd&variables={"id":"${userId}",}`;
+
+    const url = getApiUrl(userId);
+
+    console.log("url", url);
+
+    const data = await http(url);
+
+    console.log("data", data);
+
+    // const { author, media } = getShortCodeMedia($, true);
+
+    // console.log("media", media[0]);
+
+    // await writeFile("username.json", media);
+    // const highlightsButton = $('a[href*="/highlights/"]');
+    // const highlightsUrl = `https://www.instagram.com${highlightsButton.attr(
+    //   "href"
+    // )}`;
+
+    // // console.log("highlightsUrl", highlightsUrl);
+    // const d = await http(
+    //   "https://www.instagram.com/api/v1/users/web_profile_info/?username=nita_shilimkar"
+    // );
+
+    // console.log("userUrl", userUrl);
+
+    // dns.lookup("instagram.com", (err) => {
+    //   if (err) console.log(err);
+
+    //   got(userUrl).then(async (r) => {
+    //     // const userId = r.body.split(',"id":"')[1].split('",')[0];
+    //     // console.log('r', userId)
+    //     await writeFile("username.html", r.body);
+    //   });
+    // });
+
+    sendSuccessRes(res, "success");
+  }
+);
+
+// export const getInstaHighLights = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const url = req.body.url as string;
+//     const data = await http(url);
+//     await writeFile("highlight.html", data);
+
+//     sendSuccessRes(res, "done", data);
+//   }
+// );

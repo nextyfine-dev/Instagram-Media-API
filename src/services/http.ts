@@ -17,6 +17,7 @@ const http = async (url: string, method = "GET") => {
       useragent: useragent[random],
       timeout: 1e3,
       maxRedirects: 10,
+      // origin: "https://www.instagram.com",
     },
   });
   return data;

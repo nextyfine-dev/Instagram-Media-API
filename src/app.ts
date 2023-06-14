@@ -34,14 +34,16 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-app.get("/", (req, res) => sendSuccessRes(res, "Welcome to API"));
+app.get("/", (req, res) =>
+  sendSuccessRes(res, "Welcome to Instagram Media API")
+);
 
 app.get("/robots.txt", (req, res) => {
   res.type("text/plain");
   res.send("User-agent: *\nDisallow: /");
 });
 
-app.use("/v1/insta", router);
+app.use("/api/v1", router);
 
 app.all("*", (req, res, next) =>
   next(

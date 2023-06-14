@@ -5,3 +5,9 @@ export const getInstaPostValidator = RequestValidator({
     url: { type: "string", min: 11 },
   },
 });
+
+export const instaUserNameValidator = RequestValidator({
+  body: {
+    userName: { type: "string", min: 2 },
+  },
+});
