@@ -76,9 +76,7 @@ API Endpoint: `http://127.0.0.1:8080/api/v1/posts` (POST request)
       "images": [
         {
           "@type": "https://schema.org/ImageObject",
-          "caption": "A.R & V.R \nNextyfine\n.\n.\n. #nextyfine\n.\n.\n.\n#tech
-
- #technology #technologies #new #vr #ar #facebook #instadaily #it #informationtechnology #instagood #instalike #avatar #dream #info #future #art #instapic #f4f #anime #wow #l4l #img  #next #followｍe #share #all",
+          "caption": "A.R & V.R \nNextyfine\n.\n.\n. #nextyfine\n.\n.\n.\n#tech#technology #technologies #new #vr #ar #facebook #instadaily #it #informationtechnology #instagood #instalike #avatar #dream #info #future #art #instapic #f4f #anime #wow #l4l #img  #next #followｍe #share #all",
           "representativeOfPage": "True",
           "height": "740",
           "width": "720",
